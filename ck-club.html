@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CK Club — Circle K</title>
+<style>
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ck-red: #ED1C24;
+  --ck-red-dark: #C41219;
+  --ck-orange: #F7941D;
+  --ck-white: #FFFFFF;
+  --ck-bg: #F4F4F5;
+  --ck-card: #FFFFFF;
+  --ck-text: #1E1E1E;
+  --ck-text-secondary: #6B7280;
+  --ck-border: #E5E7EB;
+  --ck-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --ck-shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --ck-radius: 14px;
+  --ck-radius-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --safe-top: 48px;
+  --safe-bottom: 34px;
+}
+
+html { font-size: 16px; }
+body {
+  font-family: var(--font);
+  background: #1A1A1A;
+  color: var(--ck-text);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* Phone shell on desktop */
+.phone-shell {
+  width: 100%;
+  max-width: 390px;
+  min-height: 100vh;
+  background: var(--ck-bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 500px) {
+  body { align-items: center; padding: 24px 0; }
+  .phone-shell {
+    min-height: 844px;
+    max-height: 844px;
+    border-radius: 40px;
+    box-shadow: 0 0 0 10px #111, 0 24px 80px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+}
+
+/* ============================================
+   STATUS BAR (fake iOS)
+   ============================================ */
+.status-bar {
+  height: var(--safe-top);
+  background: var(--ck-red);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 6px;
+  flex-shrink: 0;
+}
+.status-bar .time { font-size: 14px; font-weight: 600; color: var(--ck-white); }
+.status-bar .icons { display: flex; gap: 6px; align-items: center; }
+.status-bar .icons svg { width: 16px; height: 16px; fill: var(--ck-white); }
+
+/* ============================================
+   HEADER
+   ============================================ */
+.header {
+  background: var(--ck-red);
+  padding: 12px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { width: 40px; height: 40px; flex-shrink: 0; }
+.header-text h1 { font-size: 20px; font-weight: 700; color: var(--ck-white); letter-spacing: -0.3px; }
+.header-text p { font-size: 12px; color: rgba(255,255,255,0.82); margin-top: 1px; }
+.header-right { display: flex; gap: 12px; align-items: center; }
+.header-btn {
+  background: rgba(255,255,255,0.18);
+  border: none;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.header-btn:hover, .header-btn:focus-visible { background: rgba(255,255,255,0.3); }
+.header-btn svg { width: 18px; height: 18px; fill: var(--ck-white); }
+
+/* Orange accent line */
+.accent-line {
+  height: 3px;
+  background: linear-gradient(90deg, var(--ck-orange), var(--ck-orange) 60%, transparent);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   SCROLLABLE CONTENT AREA
+   ============================================ */
+.content-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Tab content areas */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.home-content { padding: 16px 16px calc(var(--safe-bottom) + 64px); }
+
+/* ============================================
+   CARDS — shared
+   ============================================ */
+.card {
+  background: var(--ck-card);
+  border-radius: var(--ck-radius);
+  box-shadow: var(--ck-shadow);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 0;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ck-text);
+}
+.card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.badge-gold { background: linear-gradient(135deg, #F7941D, #FFBF47); color: #fff; }
+
+/* ============================================
+   CARD 1 — MEMBER QR
+   ============================================ */
+.qr-card-body {
+  display: flex;
+  gap: 14px;
+  padding: 14px 16px 16px;
+}
+.qr-area {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  background: var(--ck-white);
+  border: 1.5px solid var(--ck-border);
+  border-radius: var(--ck-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+.qr-area:hover { transform: scale(1.03); box-shadow: var(--ck-shadow-md); }
+.qr-area:active { transform: scale(0.98); }
+.qr-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.qr-store-label { font-size: 11px; color: var(--ck-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.qr-store-name { font-size: 14px; font-weight: 600; color: var(--ck-text); margin-top: 4px; }
+.qr-store-meta { font-size: 12px; color: var(--ck-text-secondary); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+.qr-store-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ck-text-secondary); }
+.qr-actions { display: flex; gap: 8px; margin-top: 10px; }
+.qr-action-btn {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--ck-border);
+  background: var(--ck-white);
+  color: var(--ck-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.qr-action-btn:hover { border-color: var(--ck-red); color: var(--ck-red); }
+.qr-action-btn:active { transform: scale(0.96); }
+.qr-action-btn svg { width: 13px; height: 13px; }
+.qr-points {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #FFF9F0;
+  border-top: 1px solid #FEF0D6;
+}
+.qr-points-left { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ck-text); }
+.qr-points-left svg { width: 16px; height: 16px; }
+.qr-stamps { display: flex; gap: 4px; align-items: center; }
+.stamp {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--ck-orange);
+  display: flex; align-items: center; justify-content: center;
+}
+.stamp.filled { background: var(--ck-orange); }
+.stamp.filled svg { width: 10px; height: 10px; fill: #fff; }
+.stamp.empty { background: transparent; }
+
+/* ============================================
+   CARD 2 — COFFEE PASS
+   ============================================ */
+.coffee-body { padding: 14px 16px 16px; }
+.coffee-row { display: flex; align-items: center; justify-content: space-between; }
+.coffee-left {}
+.coffee-sub { font-size: 13px; color: var(--ck-text-secondary); margin-top: 3px; }
+.coffee-micro { font-size: 12px; color: var(--ck-orange); margin-top: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.coffee-micro svg { width: 13px; height: 13px; fill: var(--ck-orange); }
+.btn-primary {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  background: var(--ck-red);
+  color: var(--ck-white);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: var(--ck-red-dark); }
+.btn-primary:active { transform: scale(0.96); }
+
+/* ============================================
+   CARD 3 — TONIGHT'S MISSION
+   ============================================ */
+.mission-body { padding: 14px 16px 16px; }
+.mission-text { font-size: 14px; color: var(--ck-text); font-weight: 500; }
+.mission-reward { font-size: 12px; color: var(--ck-orange); margin-top: 4px; font-weight: 500; }
+.mission-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.mission-progress { display: flex; align-items: center; gap: 8px; }
+.mission-bar-wrap { width: 80px; height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden; }
+.mission-bar { height: 100%; width: 0%; background: var(--ck-orange); border-radius: 3px; transition: width 0.3s; }
+.mission-bar-label { font-size: 11px; color: var(--ck-text-secondary); font-weight: 600; }
+.mission-badge { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ck-text-secondary); }
+.mission-badge svg { width: 14px; height: 14px; }
+.btn-secondary {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ck-red);
+  background: var(--ck-white);
+  color: var(--ck-red);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-secondary:hover { background: #FEF2F2; }
+.btn-secondary:active { transform: scale(0.96); }
+.btn-secondary.saved { background: var(--ck-red); color: var(--ck-white); border-color: var(--ck-red); }
+
+/* ============================================
+   QUICK ACTIONS
+   ============================================ */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 0 2px;
+}
+.quick-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  background: var(--ck-card);
+  border-radius: var(--ck-radius-sm);
+  box-shadow: var(--ck-shadow);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font);
+}
+.quick-chip:hover { box-shadow: var(--ck-shadow-md); transform: translateY(-1px); }
+.quick-chip:active { transform: scale(0.96); }
+.quick-chip svg { width: 22px; height: 22px; }
+.quick-chip span { font-size: 11px; font-weight: 600; color: var(--ck-text); }
+
+/* ============================================
+   BOTTOM NAV
+   ============================================ */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  left: 0; right: 0;
+  background: var(--ck-white);
+  border-top: 1px solid var(--ck-border);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 100;
+  flex-shrink: 0;
+}
+@media (min-width: 500px) {
+  .bottom-nav { padding-bottom: 8px; }
+}
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 0 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ck-text-secondary);
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-tab svg { width: 22px; height: 22px; fill: var(--ck-text-secondary); transition: fill 0.15s; }
+.nav-tab.active { color: var(--ck-red); }
+.nav-tab.active svg { fill: var(--ck-red); }
+
+/* ============================================
+   BOTTOM SHEET / MODAL
+   ============================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.overlay.show { opacity: 1; pointer-events: auto; }
+
+.bottom-sheet {
+  position: fixed;
+  left: 50%; transform: translateX(-50%) translateY(100%);
+  bottom: 0;
+  width: 100%;
+  max-width: 390px;
+  background: var(--ck-white);
+  border-radius: 20px 20px 0 0;
+  z-index: 210;
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.bottom-sheet.show { transform: translateX(-50%) translateY(0); }
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: #D1D5DB;
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+.sheet-content { padding: 20px; }
+.sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+/* QR modal */
+.qr-modal-content { display: flex; flex-direction: column; align-items: center; padding: 24px 20px 32px; }
+.qr-modal-content .qr-large { width: 200px; height: 200px; margin-bottom: 16px; }
+.qr-modal-content .member-id { font-size: 14px; color: var(--ck-text-secondary); letter-spacing: 2px; font-weight: 600; }
+.qr-modal-content .member-name { font-size: 17px; font-weight: 700; margin-top: 8px; }
+
+/* Order sheet */
+.order-section { margin-bottom: 18px; }
+.order-section label { font-size: 13px; font-weight: 600; color: var(--ck-text-secondary); display: block; margin-bottom: 8px; }
+.option-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.option-btn {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ck-border);
+  background: var(--ck-white);
+  color: var(--ck-text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.option-btn.selected { border-color: var(--ck-red); background: #FEF2F2; color: var(--ck-red); }
+.option-btn:hover { border-color: var(--ck-red); }
+
+.btn-full {
+  font-family: var(--font);
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  background: var(--ck-red);
+  color: var(--ck-white);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 8px;
+}
+.btn-full:hover { background: var(--ck-red-dark); }
+.btn-full:active { transform: scale(0.98); }
+
+/* Map sheet */
+.map-placeholder {
+  width: 100%;
+  height: 200px;
+  background: #E8F0FE;
+  border-radius: var(--ck-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.map-placeholder svg { width: 40px; height: 40px; fill: var(--ck-red); }
+.map-placeholder span { font-size: 13px; color: var(--ck-text-secondary); }
+
+/* Store detail sheet */
+.store-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ck-border);
+}
+.store-detail-row:last-child { border-bottom: none; }
+.store-detail-row svg { width: 18px; height: 18px; fill: var(--ck-text-secondary); flex-shrink: 0; }
+.store-detail-row .detail-label { font-size: 12px; color: var(--ck-text-secondary); }
+.store-detail-row .detail-value { font-size: 14px; font-weight: 500; color: var(--ck-text); }
+
+/* ============================================
+   TOAST
+   ============================================ */
+.toast {
+  position: fixed;
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  bottom: 100px;
+  background: var(--ck-text);
+  color: var(--ck-white);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 350px;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============================================
+   PLACEHOLDER TAB CONTENT
+   ============================================ */
+.tab-page { padding: 16px 16px calc(var(--safe-bottom) + 64px); }
+.tab-page-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+
+.offer-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--ck-card);
+  border-radius: var(--ck-radius-sm);
+  box-shadow: var(--ck-shadow);
+  margin-bottom: 10px;
+  align-items: center;
+}
+.offer-icon {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.offer-info { flex: 1; }
+.offer-name { font-size: 14px; font-weight: 600; }
+.offer-desc { font-size: 12px; color: var(--ck-text-secondary); margin-top: 2px; }
+.offer-expiry { font-size: 11px; color: var(--ck-orange); font-weight: 600; margin-top: 4px; }
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--ck-card);
+  border-radius: var(--ck-radius-sm);
+  box-shadow: var(--ck-shadow);
+  margin-bottom: 10px;
+}
+.order-item-left {}
+.order-item-name { font-size: 14px; font-weight: 600; }
+.order-item-meta { font-size: 12px; color: var(--ck-text-secondary); margin-top: 2px; }
+.order-status { font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
+.status-done { background: #DEF7EC; color: #03713C; }
+.status-pending { background: #FEF3C7; color: #92400E; }
+
+.account-section { margin-bottom: 20px; }
+.account-header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 18px 16px;
+  background: var(--ck-card);
+  border-radius: var(--ck-radius);
+  box-shadow: var(--ck-shadow);
+  margin-bottom: 14px;
+}
+.account-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--ck-red);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 20px; font-weight: 700;
+}
+.account-name { font-size: 17px; font-weight: 700; }
+.account-tier { font-size: 12px; color: var(--ck-orange); font-weight: 600; margin-top: 2px; }
+.account-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  background: var(--ck-card);
+  border-bottom: 1px solid var(--ck-border);
+  font-size: 14px;
+  font-weight: 500;
+}
+.account-menu-item:first-child { border-radius: var(--ck-radius-sm) var(--ck-radius-sm) 0 0; }
+.account-menu-item:last-child { border-radius: 0 0 var(--ck-radius-sm) var(--ck-radius-sm); border-bottom: none; }
+.account-menu-item svg { width: 16px; height: 16px; fill: var(--ck-text-secondary); }
+
+/* Focus states */
+button:focus-visible, .qr-area:focus-visible {
+  outline: 2px solid var(--ck-red);
+  outline-offset: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="phone-shell">
+  <!-- ======== STATUS BAR ======== -->
+  <div class="status-bar" role="presentation">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg viewBox="0 0 16 16"><path d="M1 10l3-3 3 3 5-5 3 3V3H9"/><path d="M11 3h5v5" fill="none" stroke="#fff" stroke-width="1.2"/></svg>
+      <svg viewBox="0 0 16 16"><rect x="1" y="6" width="2" height="7" rx="0.5"/><rect x="4.5" y="4" width="2" height="9" rx="0.5"/><rect x="8" y="2" width="2" height="11" rx="0.5"/><rect x="11.5" y="0" width="2" height="13" rx="0.5"/></svg>
+      <svg viewBox="0 0 24 14"><rect x="0" y="0" width="20" height="14" rx="2.5" stroke="#fff" stroke-width="1.5" fill="none"/><rect x="21" y="4" width="2" height="6" rx="1" fill="#fff"/><rect x="2" y="2" width="14" height="10" rx="1" fill="#fff"/></svg>
+    </div>
+  </div>
+
+  <!-- ======== HEADER ======== -->
+  <header class="header" role="banner">
+    <div class="header-left">
+      <!-- Circle K Logo SVG -->
+      <svg class="header-logo" viewBox="0 0 40 40" aria-label="Circle K logo">
+        <circle cx="20" cy="20" r="19" fill="#ED1C24" stroke="#fff" stroke-width="1.5"/>
+        <text x="20" y="27" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="800" fill="#fff">K</text>
+      </svg>
+      <div class="header-text">
+        <h1>CK Club</h1>
+        <p>Today's deals just for you</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="accent-line"></div>
+
+  <!-- ======== CONTENT WRAPPER ======== -->
+  <div class="content-wrapper">
+
+    <!-- ======== HOME TAB ======== -->
+    <div class="tab-content active" id="tab-home">
+      <div class="home-content">
+
+        <!-- CARD 1: MEMBER QR -->
+        <section class="card" aria-label="Member QR">
+          <div class="card-header">
+            <span class="card-title">Member QR</span>
+            <span class="card-badge badge-gold">Gold</span>
+          </div>
+          <div class="qr-card-body">
+            <button class="qr-area" id="qr-tap" aria-label="Tap to enlarge QR code" tabindex="0">
+              <!-- Stylized QR placeholder -->
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <rect width="80" height="80" rx="4" fill="#fff"/>
+                <rect x="8" y="8" width="20" height="20" rx="2" fill="#1E1E1E"/>
+                <rect x="11" y="11" width="14" height="14" rx="1" fill="#fff"/>
+                <rect x="14" y="14" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+                <rect x="52" y="8" width="20" height="20" rx="2" fill="#1E1E1E"/>
+                <rect x="55" y="11" width="14" height="14" rx="1" fill="#fff"/>
+                <rect x="58" y="14" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+                <rect x="8" y="52" width="20" height="20" rx="2" fill="#1E1E1E"/>
+                <rect x="11" y="55" width="14" height="14" rx="1" fill="#fff"/>
+                <rect x="14" y="58" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+                <rect x="32" y="8" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="38" y="8" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="8" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="32" y="14" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="14" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="32" y="20" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="38" y="20" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="32" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="38" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="8" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="14" y="38" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="20" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="8" y="38" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="8" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="20" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="14" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="32" y="38" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="38" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="38" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="52" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="58" y="38" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="64" y="32" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="52" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="64" y="44" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="52" y="52" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="58" y="52" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="52" y="58" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="64" y="52" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="58" y="64" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="64" y="58" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="64" y="64" width="8" height="8" rx="1" fill="#1E1E1E"/>
+                <rect x="32" y="52" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="38" y="58" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="52" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="32" y="64" width="4" height="4" fill="#1E1E1E"/>
+                <rect x="44" y="64" width="4" height="4" fill="#1E1E1E"/>
+              </svg>
+            </button>
+            <div class="qr-info">
+              <span class="qr-store-label">Nearest store</span>
+              <span class="qr-store-name">Circle K — Main Street</span>
+              <span class="qr-store-meta">Open 24/7 <span class="dot"></span> 350 m</span>
+              <div class="qr-actions">
+                <button class="qr-action-btn" id="btn-store-detail" aria-label="Store details">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+                  Store details
+                </button>
+                <button class="qr-action-btn" id="btn-open-map" aria-label="Open map">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                  Open map
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="qr-points">
+            <div class="qr-points-left">
+              <svg viewBox="0 0 24 24" fill="#F7941D"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+              124 points
+            </div>
+            <div class="qr-stamps" aria-label="Stamps: 3 of 5 collected">
+              <div class="stamp filled"><svg viewBox="0 0 12 12"><path d="M4.5 8.5L2 6l-.7.7L4.5 10l7-7-.7-.7z"/></svg></div>
+              <div class="stamp filled"><svg viewBox="0 0 12 12"><path d="M4.5 8.5L2 6l-.7.7L4.5 10l7-7-.7-.7z"/></svg></div>
+              <div class="stamp filled"><svg viewBox="0 0 12 12"><path d="M4.5 8.5L2 6l-.7.7L4.5 10l7-7-.7-.7z"/></svg></div>
+              <div class="stamp empty"></div>
+              <div class="stamp empty"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CARD 2: COFFEE PASS -->
+        <section class="card" aria-label="Coffee Pass">
+          <div class="card-header">
+            <span class="card-title">Coffee Pass</span>
+            <span style="font-size:12px;color:var(--ck-text-secondary);font-weight:500;">1 drink / day</span>
+          </div>
+          <div class="coffee-body">
+            <div class="coffee-row">
+              <div class="coffee-left">
+                <div class="coffee-sub">1 redemption left today</div>
+                <div class="coffee-micro">
+                  <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                  Pickup in 10 minutes
+                </div>
+              </div>
+              <button class="btn-primary" id="btn-order" aria-label="Order ahead">Order ahead</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- CARD 3: TONIGHT'S MISSION -->
+        <section class="card" aria-label="Tonight's mission">
+          <div class="card-header">
+            <span class="card-title">Tonight's mission</span>
+            <div class="mission-badge">
+              <svg viewBox="0 0 24 24" fill="#F7941D"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+              Night Owl
+            </div>
+          </div>
+          <div class="mission-body">
+            <div class="mission-text">Buy 2 snacks after 10 p.m.</div>
+            <div class="mission-reward">Unlock badge + voucher</div>
+            <div class="mission-row">
+              <div class="mission-progress">
+                <div class="mission-bar-wrap"><div class="mission-bar" id="mission-bar"></div></div>
+                <span class="mission-bar-label">0 / 2</span>
+              </div>
+              <button class="btn-secondary" id="btn-save-offer" aria-label="Save offer">Save offer</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions" role="toolbar" aria-label="Quick actions">
+          <button class="quick-chip" aria-label="Offers" data-action="offers">
+            <svg viewBox="0 0 24 24" fill="var(--ck-red)"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+            <span>Offers</span>
+          </button>
+          <button class="quick-chip" aria-label="My QR" data-action="myqr">
+            <svg viewBox="0 0 24 24" fill="var(--ck-red)"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
+            <span>My QR</span>
+          </button>
+          <button class="quick-chip" aria-label="Stores" data-action="stores">
+            <svg viewBox="0 0 24 24" fill="var(--ck-red)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+            <span>Stores</span>
+          </button>
+          <button class="quick-chip" aria-label="Orders" data-action="orders">
+            <svg viewBox="0 0 24 24" fill="var(--ck-red)"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>
+            <span>Orders</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ======== OFFERS TAB ======== -->
+    <div class="tab-content" id="tab-offers">
+      <div class="tab-page">
+        <div class="tab-page-title">Offers</div>
+        <div class="offer-card">
+          <div class="offer-icon" style="background:#FEF3C7;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#F7941D"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+          </div>
+          <div class="offer-info">
+            <div class="offer-name">Buy 1 Get 1 Free — Iced Coffee</div>
+            <div class="offer-desc">Valid at Main Street store</div>
+            <div class="offer-expiry">Expires in 2 days</div>
+          </div>
+        </div>
+        <div class="offer-card">
+          <div class="offer-icon" style="background:#FEE2E2;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#ED1C24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          </div>
+          <div class="offer-info">
+            <div class="offer-name">30% Off Snack Zone</div>
+            <div class="offer-desc">All snacks 6:00–10:00 PM</div>
+            <div class="offer-expiry">Expires today</div>
+          </div>
+        </div>
+        <div class="offer-card">
+          <div class="offer-icon" style="background:#DEF7EC;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#03713C"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <div class="offer-info">
+            <div class="offer-name">Free 500ml Water</div>
+            <div class="offer-desc">Orders over $5.00</div>
+            <div class="offer-expiry">5 days left</div>
+          </div>
+        </div>
+        <div class="offer-card">
+          <div class="offer-icon" style="background:#EDE9FE;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#7C3AED"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61z"/></svg>
+          </div>
+          <div class="offer-info">
+            <div class="offer-name">2x Points Weekend</div>
+            <div class="offer-desc">Double points on Sat & Sun</div>
+            <div class="offer-expiry">This weekend</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ORDERS TAB ======== -->
+    <div class="tab-content" id="tab-orders">
+      <div class="tab-page">
+        <div class="tab-page-title">Orders</div>
+        <div class="order-item">
+          <div class="order-item-left">
+            <div class="order-item-name">Iced Coffee — Size M</div>
+            <div class="order-item-meta">Today, 08:32 • Main Street</div>
+          </div>
+          <span class="order-status status-done">Picked up</span>
+        </div>
+        <div class="order-item">
+          <div class="order-item-left">
+            <div class="order-item-name">Americano — Size L</div>
+            <div class="order-item-meta">Yesterday, 14:15 • Park Avenue</div>
+          </div>
+          <span class="order-status status-done">Picked up</span>
+        </div>
+        <div class="order-item">
+          <div class="order-item-left">
+            <div class="order-item-name">Peach Tea — Size M</div>
+            <div class="order-item-meta">04/15, 19:40 • Main Street</div>
+          </div>
+          <span class="order-status status-done">Picked up</span>
+        </div>
+        <div class="order-item">
+          <div class="order-item-left">
+            <div class="order-item-name">Cold Cut Sandwich</div>
+            <div class="order-item-meta">04/14, 07:10 • Broadway</div>
+          </div>
+          <span class="order-status status-pending">Cancelled</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ACCOUNT TAB ======== -->
+    <div class="tab-content" id="tab-account">
+      <div class="tab-page">
+        <div class="tab-page-title">Account</div>
+        <div class="account-header">
+          <div class="account-avatar">A</div>
+          <div>
+            <div class="account-name">Alex Johnson</div>
+            <div class="account-tier">Gold Member • 124 points</div>
+          </div>
+        </div>
+        <div class="account-section">
+          <div class="account-menu-item">
+            Personal Information
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item">
+            Membership Tier
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item">
+            Payment Methods
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item">
+            Transaction History
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+        </div>
+        <div class="account-section">
+          <div class="account-menu-item">
+            Notification Settings
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item">
+            Language
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item">
+            Help & Support
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+          <div class="account-menu-item" style="color:var(--ck-red);">
+            Log Out
+            <svg viewBox="0 0 24 24" fill="var(--ck-red)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-wrapper -->
+
+  <!-- ======== BOTTOM NAV ======== -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-tab active" data-tab="home" aria-label="Home" aria-current="page">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </button>
+    <button class="nav-tab" data-tab="offers" aria-label="Offers">
+      <svg viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+      Offers
+    </button>
+    <button class="nav-tab" data-tab="orders" aria-label="Orders">
+      <svg viewBox="0 0 24 24"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>
+      Orders
+    </button>
+    <button class="nav-tab" data-tab="account" aria-label="Account">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Account
+    </button>
+  </nav>
+
+</div><!-- /phone-shell -->
+
+<!-- ======== OVERLAY ======== -->
+<div class="overlay" id="overlay" aria-hidden="true"></div>
+
+<!-- ======== QR MODAL (bottom sheet) ======== -->
+<div class="bottom-sheet" id="sheet-qr" role="dialog" aria-label="Member QR enlarged">
+  <div class="sheet-handle"></div>
+  <div class="qr-modal-content">
+    <svg class="qr-large" width="200" height="200" viewBox="0 0 80 80" fill="none">
+      <rect width="80" height="80" rx="4" fill="#fff"/>
+      <rect x="8" y="8" width="20" height="20" rx="2" fill="#1E1E1E"/>
+      <rect x="11" y="11" width="14" height="14" rx="1" fill="#fff"/>
+      <rect x="14" y="14" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+      <rect x="52" y="8" width="20" height="20" rx="2" fill="#1E1E1E"/>
+      <rect x="55" y="11" width="14" height="14" rx="1" fill="#fff"/>
+      <rect x="58" y="14" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+      <rect x="8" y="52" width="20" height="20" rx="2" fill="#1E1E1E"/>
+      <rect x="11" y="55" width="14" height="14" rx="1" fill="#fff"/>
+      <rect x="14" y="58" width="8" height="8" rx="0.5" fill="#1E1E1E"/>
+      <rect x="32" y="8" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="38" y="8" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="8" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="32" y="14" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="14" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="32" y="20" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="38" y="20" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="32" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="38" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="8" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="14" y="38" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="20" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="8" y="38" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="8" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="20" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="14" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="32" y="38" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="38" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="38" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="52" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="58" y="38" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="64" y="32" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="52" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="64" y="44" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="52" y="52" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="58" y="52" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="52" y="58" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="64" y="52" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="58" y="64" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="64" y="58" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="64" y="64" width="8" height="8" rx="1" fill="#1E1E1E"/>
+      <rect x="32" y="52" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="38" y="58" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="52" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="32" y="64" width="4" height="4" fill="#1E1E1E"/>
+      <rect x="44" y="64" width="4" height="4" fill="#1E1E1E"/>
+    </svg>
+    <div class="member-name">Alex Johnson</div>
+    <div class="member-id">CK-2024-0819-7742</div>
+  </div>
+</div>
+
+<!-- ======== MAP SHEET ======== -->
+<div class="bottom-sheet" id="sheet-map" role="dialog" aria-label="Store map">
+  <div class="sheet-handle"></div>
+  <div class="sheet-content">
+    <div class="sheet-title">Nearby Stores</div>
+    <div class="map-placeholder">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+      <span>Map loading...</span>
+    </div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px;">Circle K — Main Street</div>
+    <div style="font-size:13px;color:var(--ck-text-secondary);margin-bottom:4px;">123 Main Street, Downtown</div>
+    <div style="font-size:13px;color:var(--ck-text-secondary);margin-bottom:12px;">Open 24/7 • 350 m away</div>
+    <div style="font-size:14px;font-weight:600;margin-top:16px;margin-bottom:8px;">Circle K — Park Avenue</div>
+    <div style="font-size:13px;color:var(--ck-text-secondary);margin-bottom:4px;">456 Park Avenue, Midtown</div>
+    <div style="font-size:13px;color:var(--ck-text-secondary);">Open 24/7 • 1.2 km away</div>
+  </div>
+</div>
+
+<!-- ======== STORE DETAIL SHEET ======== -->
+<div class="bottom-sheet" id="sheet-store" role="dialog" aria-label="Store details">
+  <div class="sheet-handle"></div>
+  <div class="sheet-content">
+    <div class="sheet-title">Circle K — Main Street</div>
+    <div class="store-detail-row">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+      <div>
+        <div class="detail-label">Address</div>
+        <div class="detail-value">123 Main Street, Downtown, City Center</div>
+      </div>
+    </div>
+    <div class="store-detail-row">
+      <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+      <div>
+        <div class="detail-label">Hours</div>
+        <div class="detail-value">Open 24/7</div>
+      </div>
+    </div>
+    <div class="store-detail-row">
+      <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      <div>
+        <div class="detail-label">Phone</div>
+        <div class="detail-value">028 3925 1234</div>
+      </div>
+    </div>
+    <div class="store-detail-row">
+      <svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+      <div>
+        <div class="detail-label">Services</div>
+        <div class="detail-value">Coffee, Food to Go, ATM, Bill Payment</div>
+      </div>
+    </div>
+    <div class="store-detail-row">
+      <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+      <div>
+        <div class="detail-label">Distance</div>
+        <div class="detail-value">350 m — ~5 min walk</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== ORDER SHEET ======== -->
+<div class="bottom-sheet" id="sheet-order" role="dialog" aria-label="Order ahead">
+  <div class="sheet-handle"></div>
+  <div class="sheet-content">
+    <div class="sheet-title">Order ahead</div>
+    <div class="order-section">
+      <label>Type</label>
+      <div class="option-group" data-group="type">
+        <button class="option-btn selected" data-value="hot">Hot</button>
+        <button class="option-btn" data-value="iced">Iced</button>
+      </div>
+    </div>
+    <div class="order-section">
+      <label>Size</label>
+      <div class="option-group" data-group="size">
+        <button class="option-btn" data-value="S">S</button>
+        <button class="option-btn selected" data-value="M">M</button>
+        <button class="option-btn" data-value="L">L</button>
+      </div>
+    </div>
+    <div class="order-section">
+      <label>Pickup time</label>
+      <div class="option-group" data-group="time">
+        <button class="option-btn selected" data-value="10min">10 min</button>
+        <button class="option-btn" data-value="20min">20 min</button>
+        <button class="option-btn" data-value="30min">30 min</button>
+      </div>
+    </div>
+    <button class="btn-full" id="btn-confirm-order" aria-label="Confirm order">Confirm order</button>
+  </div>
+</div>
+
+<!-- ======== TOAST ======== -->
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<!-- ======== JAVASCRIPT ======== -->
+<script>
+(function() {
+  'use strict';
+
+  /* ---- Helpers ---- */
+  var $ = function(sel) { return document.querySelector(sel); };
+  var $$ = function(sel) { return document.querySelectorAll(sel); };
+
+  function showToast(msg) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  function openSheet(id) {
+    $('#overlay').classList.add('show');
+    $('#' + id).classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAllSheets() {
+    $('#overlay').classList.remove('show');
+    $$('.bottom-sheet').forEach(function(s) { s.classList.remove('show'); });
+    document.body.style.overflow = '';
+  }
+
+  $('#overlay').addEventListener('click', closeAllSheets);
+
+  /* ---- Bottom Nav ---- */
+  $$('.nav-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      $$('.nav-tab').forEach(function(t) { t.classList.remove('active'); t.removeAttribute('aria-current'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-current', 'page');
+      var target = tab.getAttribute('data-tab');
+      $$('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      $('#tab-' + target).classList.add('active');
+    });
+  });
+
+  /* ---- QR Tap ---- */
+  $('#qr-tap').addEventListener('click', function() { openSheet('sheet-qr'); });
+
+  /* ---- Store Details ---- */
+  $('#btn-store-detail').addEventListener('click', function() { openSheet('sheet-store'); });
+
+  /* ---- Open Map ---- */
+  $('#btn-open-map').addEventListener('click', function() { openSheet('sheet-map'); });
+
+  /* ---- Order Ahead ---- */
+  var orderState = JSON.parse(localStorage.getItem('ck_order') || '{"type":"hot","size":"M","time":"10min"}');
+
+  function applyOrderState() {
+    $$('#sheet-order .option-group').forEach(function(g) {
+      var group = g.getAttribute('data-group');
+      g.querySelectorAll('.option-btn').forEach(function(btn) {
+        btn.classList.toggle('selected', btn.getAttribute('data-value') === orderState[group]);
+      });
+    });
+  }
+  applyOrderState();
+
+  $$('#sheet-order .option-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var group = btn.parentElement.getAttribute('data-group');
+      orderState[group] = btn.getAttribute('data-value');
+      localStorage.setItem('ck_order', JSON.stringify(orderState));
+      applyOrderState();
+    });
+  });
+
+  $('#btn-order').addEventListener('click', function() { openSheet('sheet-order'); });
+
+  $('#btn-confirm-order').addEventListener('click', function() {
+    closeAllSheets();
+    showToast('Order placed! Head to the store to pick up.');
+  });
+
+  /* ---- Save Offer ---- */
+  var offerSaved = localStorage.getItem('ck_offer_saved') === '1';
+  var btnSave = $('#btn-save-offer');
+
+  function renderSaveBtn() {
+    if (offerSaved) {
+      btnSave.textContent = 'Saved ✓';
+      btnSave.classList.add('saved');
+    } else {
+      btnSave.textContent = 'Save offer';
+      btnSave.classList.remove('saved');
+    }
+  }
+  renderSaveBtn();
+
+  btnSave.addEventListener('click', function() {
+    offerSaved = !offerSaved;
+    localStorage.setItem('ck_offer_saved', offerSaved ? '1' : '0');
+    renderSaveBtn();
+    showToast(offerSaved ? 'Offer saved to your wallet' : 'Offer removed');
+  });
+
+  /* ---- Quick Actions ---- */
+  $$('.quick-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var action = chip.getAttribute('data-action');
+      if (action === 'offers') {
+        $$('.nav-tab').forEach(function(t) { t.classList.remove('active'); t.removeAttribute('aria-current'); });
+        $$('.nav-tab')[1].classList.add('active');
+        $$('.nav-tab')[1].setAttribute('aria-current', 'page');
+        $$('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        $('#tab-offers').classList.add('active');
+      } else if (action === 'myqr') {
+        openSheet('sheet-qr');
+      } else if (action === 'stores') {
+        openSheet('sheet-map');
+      } else if (action === 'orders') {
+        $$('.nav-tab').forEach(function(t) { t.classList.remove('active'); t.removeAttribute('aria-current'); });
+        $$('.nav-tab')[2].classList.add('active');
+        $$('.nav-tab')[2].setAttribute('aria-current', 'page');
+        $$('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        $('#tab-orders').classList.add('active');
+      }
+      showToast(chip.querySelector('span').textContent);
+    });
+  });
+
+  /* ---- Swipe-to-close sheets ---- */
+  $$('.bottom-sheet').forEach(function(sheet) {
+    var startY = 0;
+    sheet.addEventListener('touchstart', function(e) {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    sheet.addEventListener('touchend', function(e) {
+      var diff = e.changedTouches[0].clientY - startY;
+      if (diff > 80) closeAllSheets();
+    }, { passive: true });
+  });
+
+})();
+</script>
+
+</body>
+</html>
